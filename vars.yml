@@ -1,0 +1,14 @@
+---
+
+instance_type: t2.micro
+security_group_name: FreeBSD
+vpc_name: FreeBSD
+vpc_cidr: 172.17.0.0/16
+public_subnet_cidr: 172.17.1.0/24
+public_subnet_name: FreeBSD
+igw_name : FreeBSD
+image: ami-db710fa3
+keypair: amazon1 
+region: us-west-2
+count: 1
+
