@@ -7,8 +7,9 @@ vpc_cidr: 172.17.0.0/16
 public_subnet_cidr: 172.17.1.0/24
 public_subnet_name: FreeBSD
 igw_name : FreeBSD
-image: ami-db710fa3
+
+# FreeBSD 12
+image: ami-0ec55ef66da2c9765
 keypair: amazon1 
 region: us-west-2
 count: 1
-

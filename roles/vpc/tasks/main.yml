@@ -70,6 +70,7 @@
         region: "{{ region }}"
         groups: "{{ security_group_name}}"
         vpc_subnet_id: "{{ freebsd_public_subnet.subnet.id }}"
+        key_name: "{{ keypair }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         count: "{{ count }}"
