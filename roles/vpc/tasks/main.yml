@@ -9,7 +9,7 @@
         aws_secret_key: "{{ aws_secret_key }}"
       register: freebsd_vpc
 
-    - name: Create subnet "{{ public_subnet_cidr }}" in VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
+    - name: Create subnet {{ public_subnet_cidr }} in VPC {{ vpc_name }} ( {{ freebsd_vpc.vpc.id }} )
       ec2_vpc_subnet:
        state: present
        vpc_id: "{{ freebsd_vpc.vpc.id }}"
@@ -22,7 +22,7 @@
          Name: "{{ public_subnet_name }}"
       register: freebsd_public_subnet
 
-    - name: Create IGW "{{ igw_name }}" on VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
+    - name: Create IGW {{ igw_name }} on VPC {{ vpc_name }} ( {{ freebsd_vpc.vpc.id }} )
       ec2_vpc_igw:
        vpc_id: "{{ freebsd_vpc.vpc.id }}"
        region: "{{ region }}"
@@ -33,7 +33,7 @@
          Name: "{{ igw_name }}"
       register: freebsd_igw
 
-    - name:               Set up public subnet route table
+    - name: Set up public subnet route table
       ec2_vpc_route_table:
         vpc_id:           "{{ freebsd_vpc.vpc.id }}"
         region:           "{{ region }}"
@@ -47,7 +47,7 @@
           - dest:         "0.0.0.0/0"
             gateway_id:   "{{ freebsd_igw.gateway_id }}"
 
-    - name: Create security group "{{ security_group_name }}" on VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
+    - name: Create security group {{ security_group_name }} on VPC {{ vpc_name }} ( {{ freebsd_vpc.vpc.id }} )
       ec2_group:
         name: "{{ security_group_name }}"
         description: The security group
@@ -62,7 +62,7 @@
             cidr_ip: 0.0.0.0/0
       register: freebsd_security_group 
 
-    - name: Create EC2 Instance of type "{{ instance_type }}" with ami "{{ image }}" in VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
+    - name: Create EC2 Instance of type {{ instance_type }} with ami {{ image }} in VPC {{ vpc_name }} ( {{ freebsd_vpc.vpc.id }} )
       ec2:
         image: "{{ image }}"
         wait: true 
@@ -74,5 +74,7 @@
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         count: "{{ count }}"
+        instance_tags:
+          os: FreeBSD
       register: ec2
 

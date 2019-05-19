@@ -5,8 +5,13 @@ An Ansible recipie to deploy FreeBSD to AWS EC2
 
 ## Prerequisites
 
-* You will need to create your own AWS keyset and refer to it in the `vars.yml` file
-* You will need to create your own vault file `aws_keys.yml` containing the variables `aws_access_key` and `aws_secret_key`
+### You will need to create your own AWS keyset and refer to it in the `vars.yml` file
+
+### You will need to create your own vault file `aws_keys.yml` containing the variables `aws_access_key` and `aws_secret_key`. The EC2 user account referred by to aws_access_key must have these roles
+
+* AmazonEC2FullAccess
+* AmazonVPCFullAccess
+
 
 ## Usage
 
