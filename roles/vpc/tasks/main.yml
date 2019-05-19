@@ -7,12 +7,12 @@
         state: present
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
-      register: vpc
+      register: freebsd_vpc
 
     - name: Create subnet "{{ public_subnet_cidr }}" in VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
       ec2_vpc_subnet:
        state: present
-       vpc_id: "{{ vpc.vpc.id }}"
+       vpc_id: "{{ freebsd_vpc.vpc.id }}"
        region: "{{ region }}"
        cidr: "{{ public_subnet_cidr }}"
        aws_access_key: "{{ aws_access_key }}"
@@ -20,39 +20,39 @@
        map_public: yes
        resource_tags:
          Name: "{{ public_subnet_name }}"
-      register: public_subnet
+      register: freebsd_public_subnet
 
     - name: Create IGW "{{ igw_name }}" on VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
       ec2_vpc_igw:
-       vpc_id: "{{ vpc.vpc.id }}"
+       vpc_id: "{{ freebsd_vpc.vpc.id }}"
        region: "{{ region }}"
        aws_access_key: "{{ aws_access_key }}"
        aws_secret_key: "{{ aws_secret_key }}"
        state: "present"
        tags:
          Name: "{{ igw_name }}"
-      register: igw
+      register: freebsd_igw
 
     - name:               Set up public subnet route table
       ec2_vpc_route_table:
-        vpc_id:           "{{ vpc.vpc.id }}"
+        vpc_id:           "{{ freebsd_vpc.vpc.id }}"
         region:           "{{ region }}"
         aws_access_key:   "{{ aws_access_key }}"
         aws_secret_key:   "{{ aws_secret_key }}"
         tags:
           Name:           "Public"
         subnets:
-          - "{{ public_subnet.subnet.id }}"
+          - "{{ freebsd_public_subnet.subnet.id }}"
         routes:
           - dest:         "0.0.0.0/0"
-            gateway_id:   "{{ igw.gateway_id }}"
+            gateway_id:   "{{ freebsd_igw.gateway_id }}"
 
     - name: Create security group "{{ security_group_name }}" on VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
       ec2_group:
         name: "{{ security_group_name }}"
         description: The security group
         region: "{{ region }}"
-        vpc_id: "{{ vpc.vpc.id }}"
+        vpc_id: "{{ freebsd_vpc.vpc.id }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         rules:
@@ -60,11 +60,7 @@
             from_port: 22
             to_port: 22
             cidr_ip: 0.0.0.0/0
-#          - proto: ICMP
-#            from_port: -1
-#            to_port: -1
-#            cidr_ip: 0.0.0.0/0
-      register: security_group 
+      register: freebsd_security_group 
 
     - name: Create EC2 Instance of type "{{ instance_type }}" with ami "{{ image }}" in VPC "{{ vpc_name }} ("{{ vpc.vpc.id }}")
       ec2:
@@ -73,7 +69,7 @@
         instance_type: "{{ instance_type }}"
         region: "{{ region }}"
         groups: "{{ security_group_name}}"
-        vpc_subnet_id: "{{ public_subnet.subnet.id }}"
+        vpc_subnet_id: "{{ freebsd_public_subnet.subnet.id }}"
         aws_access_key: "{{ aws_access_key }}"
         aws_secret_key: "{{ aws_secret_key }}"
         count: "{{ count }}"
